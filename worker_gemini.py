@@ -99,15 +99,34 @@ try:
 except ValueError:
     raise ValueError(f"WORKER_INDEX bukan integer valid: {worker_index_str}")
 
-# API key diambil dari environment (di-inject dari GitHub Secrets)
-API_KEY = os.getenv("GEMINI_API_KEY")
-if not API_KEY:
+# Ambil raw secret: boleh berisi 1 atau banyak API key (dipisah newline)
+raw_api = os.getenv("GEMINI_API_KEY", "").strip()
+if not raw_api:
     raise ValueError(
-        "Environment variable GEMINI_API_KEY tidak ditemukan. "
+        "Environment variable GEMINI_API_KEY tidak ditemukan / kosong. "
         "Pastikan sudah diset di GitHub Secrets dan dipasang di YAML."
     )
 
-print(f"🔑 Worker index {WORKER_INDEX} pakai API key prefix: {API_KEY[:8]}...")
+# Pecah per baris → jadi list API key
+api_keys = [line.strip() for line in raw_api.splitlines() if line.strip()]
+
+if not api_keys:
+    raise ValueError(
+        "GEMINI_API_KEY ter-set tapi tidak ada API key valid (semua kosong?)."
+    )
+
+if WORKER_INDEX < 0 or WORKER_INDEX >= len(api_keys):
+    raise IndexError(
+        f"WORKER_INDEX={WORKER_INDEX} di luar range. "
+        f"Hanya tersedia {len(api_keys)} API key di secret GEMINI_API_KEY."
+    )
+
+API_KEY = api_keys[WORKER_INDEX]
+
+print(
+    f"🔑 Worker index {WORKER_INDEX} pakai API key ke-{WORKER_INDEX+1} "
+    f"dari total {len(api_keys)} key. Prefix: {API_KEY[:8]}..."
+)
 
 client = genai.Client(api_key=API_KEY)
 
@@ -129,12 +148,6 @@ def get_next_job():
         return None
 
     return data.get("job")
-
-API_KEY = os.getenv("GEMINI_API_KEY")
-if not API_KEY:
-    raise ValueError("GEMINI_API_KEY kosong atau tidak kebaca dari env!")
-
-print("DEBUG: panjang API key:", len(API_KEY))
 
 
 # ============================
@@ -264,6 +277,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
