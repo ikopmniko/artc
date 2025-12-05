@@ -130,6 +130,12 @@ def get_next_job():
 
     return data.get("job")
 
+API_KEY = os.getenv("GEMINI_API_KEY")
+if not API_KEY:
+    raise ValueError("GEMINI_API_KEY kosong atau tidak kebaca dari env!")
+
+print("DEBUG: panjang API key:", len(API_KEY))
+
 
 # ============================
 # KIRIM HASIL KE SERVER
@@ -258,5 +264,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
