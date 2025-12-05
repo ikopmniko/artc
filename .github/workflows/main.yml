@@ -31,7 +31,8 @@ jobs:
 
       - name: Jalankan worker Gemini
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}     # <===== API SAFE
-          WORKER_INDEX: ${{ matrix.WORKER_INDEX }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # diambil dari Secrets
+          WORKER_INDEX: ${{ matrix.WORKER_INDEX }}        # index worker
         run: |
+          echo "🚀 Start worker index: $WORKER_INDEX"
           python worker_gemini.py
