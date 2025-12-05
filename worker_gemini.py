@@ -111,10 +111,6 @@ print(f"🔑 Worker index {WORKER_INDEX} pakai API key prefix: {API_KEY[:8]}..."
 
 client = genai.Client(api_key=API_KEY)
 
-API_KEY = os.getenv("GEMINI_API_KEY")
-print("DEBUG length:", len(API_KEY))  # AMAN, tidak print isinya
-
-
 
 # ============================
 # AMBIL JOB DARI SERVER
@@ -262,4 +258,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
